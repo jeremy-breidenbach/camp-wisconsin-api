@@ -4,18 +4,8 @@ namespace App\Libraries;
 
 use GuzzleHttp\Client;
 
-class XmlFunctions
+class XmlArray
 {
-    function getApiXml($baseUri, $requestDetails)
-    {
-        $client = new Client(['base_uri' => $baseUri, 'delay' => 500]);
-        $response = $client->request('GET', $requestDetails);
-        $body = $response->getBody();
-        $stringBody = (string) $body;
-        return $xml = simplexml_load_string($stringBody);
-    }
-
-
     /* xmlToArray function from:
      * http://outlandish.com/blog/xml-to-json/
      */

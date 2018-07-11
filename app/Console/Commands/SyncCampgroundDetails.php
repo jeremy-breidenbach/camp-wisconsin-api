@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Libraries\XmlFunctions;
+use App\Libraries\XmlArray;
+use App\Libraries\XmlRequest;
 use App\Campground;
 
 class SyncCampgroundDetails extends Command
@@ -43,19 +44,22 @@ class SyncCampgroundDetails extends Command
         $bar = $this->output->createProgressBar($campgrounds->count());
         foreach ($campgrounds as $campground)
         {
-            $XmlFunctions = new XmlFunctions;
-            $requestDetails = 'campground/details?contractCode=' . $campground->contractID . '&parkId=' . $campground->facilityID . '&api_key=' . env('CAMPGROUND_API_KEY');
-            $xml = $XmlFunctions->getApiXml(env('CAMPGROUND_API_BASE_URI'), $requestDetails);
-            $details = $XmlFunctions->xmlToArray($xml);
-            $campground->description = html_entity_decode(html_entity_decode($details['detailDescription']['description']), ENT_QUOTES | ENT_HTML401);
-            $campground->address = $details['detailDescription']['address']['streetAddress'];
-            $campground->city = $details['detailDescription']['address']['city'];
-            $campground->state = $details['detailDescription']['address']['state'];
-            $campground->zip = $details['detailDescription']['address']['zip'];
-            $campground->drivingDirection = $details['detailDescription']['drivingDirection'];
-            $campground->reservationUrl = $details['detailDescription']['fullReservationUrl'];
-            $campground->photos = json_encode($details['detailDescription']['photo']);
-            $campground->amenities = json_encode($details['detailDescription']['amenity']);
+            $XmlRequest = new XmlRequest;
+            $params = 'campground/details?contractCode=' . $campground->contractID . '&parkId=' . $campground->facilityID . '&api_key=' . env('CAMPGROUND_API_KEY');
+            $response = $XmlRequest->getApiXml(env('CAMPGROUND_API_BASE_URI'), $params);
+
+            $XmlArray = new XmlArray;
+            $detailsArray = $XmlArray->xmlToArray($response);
+            $details = $detailsArray['detailDescription'];
+            $campground->description = html_entity_decode(html_entity_decode($details['description']), ENT_QUOTES | ENT_HTML401);
+            $campground->address = $details['address']['streetAddress'];
+            $campground->city = $details['address']['city'];
+            $campground->state = $details['address']['state'];
+            $campground->zip = $details['address']['zip'];
+            $campground->drivingDirection = $details['drivingDirection'];
+            $campground->reservationUrl = $details['fullReservationUrl'];
+            $campground->photos = json_encode($details['photo']);
+            $campground->amenities = json_encode($details['amenity']);
             $campground->save();
             $bar->advance();
         }

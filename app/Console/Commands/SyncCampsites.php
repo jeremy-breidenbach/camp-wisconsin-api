@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Libraries\XmlFunctions;
+use App\Libraries\XmlArray;
+use App\Libraries\XmlRequest;
 use App\Campground;
 use App\Campsite;
 
@@ -44,10 +45,12 @@ class SyncCampsites extends Command
         $bar = $this->output->createProgressBar($campgrounds->count());
         foreach ($campgrounds as $campground)
         {
-            $XmlFunctions = new XmlFunctions;
-            $requestDetails = 'campsites/?contractCode=' . $campground->contractID . '&parkId=' . $campground->facilityID . '&api_key=' . env('CAMPGROUND_API_KEY');
-            $xml = $XmlFunctions->getApiXml(env('CAMPGROUND_API_BASE_URI'), $requestDetails);
-            $details = $XmlFunctions->xmlToArray($xml);
+            $XmlRequest = new XmlRequest;
+            $params = 'campsites/?contractCode=' . $campground->contractID . '&parkId=' . $campground->facilityID . '&api_key=' . env('CAMPGROUND_API_KEY');
+            $response = $XmlRequest->getApiXml(env('CAMPGROUND_API_BASE_URI'), $params);
+
+            $XmlArray = new XmlArray;
+            $details = $XmlArray->xmlToArray($response);
             if ($details['resultset']['count'] === '1') {
                 $campsite = $details['resultset']['result'];
                 $this->saveCampsiteRecord($campground, $campsite);

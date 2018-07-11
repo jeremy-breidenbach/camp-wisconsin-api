@@ -11,4 +11,4 @@
 |
 */
 
-Route::get('/testCampsitesArray/{contractCode}/{parkId}', 'TestController@testCampsitesArray');
+// Route::get('/testCampsitesArray/{contractCode}/{parkId}', 'TestController@testCampsitesArray');

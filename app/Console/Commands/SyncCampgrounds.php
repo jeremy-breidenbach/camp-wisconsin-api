@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Libraries\XmlFunctions;
+use App\Libraries\XmlArray;
+use App\Libraries\XmlRequest;
 use App\Campground;
 
 class SyncCampgrounds extends Command
@@ -39,14 +40,16 @@ class SyncCampgrounds extends Command
      */
     public function handle()
     {
-        $XmlFunctions = new XmlFunctions;
-        $xml = $XmlFunctions->getApiXml(env('CAMPGROUND_API_BASE_URI'), 'campgrounds?pstate=WI&api_key=' . env('CAMPGROUND_API_KEY'));
-        $results = $XmlFunctions->xmlToArray($xml);
+        $XmlRequest = new XmlRequest;
+        $response = $XmlRequest->getApiXml(env('CAMPGROUND_API_BASE_URI'), 'campgrounds?pstate=WI&api_key=' . env('CAMPGROUND_API_KEY'));
+        
+        $XmlArray = new XmlArray;
+        $results = $XmlArray->xmlToArray($response);
         $campgrounds = $results['resultset']['result'];
         $bar = $this->output->createProgressBar(count($campgrounds));
 
         foreach ($campgrounds as $campground) {
-            if (($campground['contractID'] != 'ELSI') && ($campground['contractID'] != 'INDP')) {
+            if (($campground['contractID'] != 'ELSI') && ($campground['contractID'] != 'INDP') && ($campground['contractID'] != 'KOAI')) {
                 $campgroundRecord = Campground::firstOrNew(['facilityID' => $campground['facilityID']]);
                 $campgroundRecord->facilityName = $campground['facilityName'];
                 $campgroundRecord->contractID = $campground['contractID'];
