@@ -47,9 +47,9 @@ class CampsiteController extends Controller
      * @param  \App\Campsite  $campsite
      * @return \Illuminate\Http\Response
      */
-    public function show(Campsite $campsite)
+    public function show($campgroundId, Campsite $campsite)
     {
-        //
+        return $campsite;
     }
 
     /**

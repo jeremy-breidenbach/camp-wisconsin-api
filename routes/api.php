@@ -22,3 +22,5 @@ Route::get('campgrounds', 'CampgroundController@index');
 Route::get('campgrounds/{campground}', 'CampgroundController@show');
 
 Route::get('campgrounds/{campgroundId}/campsites', 'CampsiteController@index');
+
+Route::get('campgrounds/{campgroundId}/campsites/{campsite}', 'CampsiteController@show');
