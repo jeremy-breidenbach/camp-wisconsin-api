@@ -12,4 +12,9 @@ class Campsite extends Model
     {
          return $this->belongsTo('App\Campground');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany('App\User')->withTimestamps();
+    }
 }
